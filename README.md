@@ -1,5 +1,7 @@
 # PeachCC
+
 https://www.sigbus.info/compilerbook
+https://github.com/rui314/chibicc
 
 # setup
 
