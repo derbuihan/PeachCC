@@ -4,8 +4,8 @@ assert() {
   expected="$1"
   input="$2"
 
-  ./9cc "$input" > tmp.s
-  cc -o tmp tmp.s
+  ./9cc "$input" > tmp.s || exit
+  gcc -static -o tmp tmp.s
   ./tmp
   actual="$?"
 
@@ -23,5 +23,8 @@ assert 0 "1+2-3"
 assert 21 "5+20-4"
 assert 4 "3 - 2 - 1 + 4"
 assert 41 " 12 + 34 - 5 "
+assert 10 "2+2*4"
+assert 15 "3 * (5 - 2 + 3 -1)"
+assert 4 "(3+5)/2"
 
 echo OK

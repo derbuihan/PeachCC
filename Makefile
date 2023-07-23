@@ -1,6 +1,7 @@
-CFLAGS=-std=c11 -g -static
+CFLAGS=-std=c11 -g -fno-common
 
-9cc: 9cc.c
+9cc: main.o
+	$(CC) -o 9cc main.o $(LDFLAGS)
 test: 9cc
 	./test.sh
 clean:
