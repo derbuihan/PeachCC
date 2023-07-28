@@ -39,6 +39,17 @@ static Node *new_num(int val) {
     return node;
 }
 
+bool equal(Token *tok, char *op) {
+    return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
+}
+
+Token *skip(Token *tok, char *s) {
+    if (!equal(tok, s)) {
+        error_tok(tok, "expect '%s'", s);
+    }
+    return tok->next;
+}
+
 // expr = equality
 static Node *expr(Token **rest, Token *tok) {
     return equality(rest, tok);
