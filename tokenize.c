@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "peachcc.h"
 
 static char *current_input;
 

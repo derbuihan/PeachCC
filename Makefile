@@ -2,14 +2,14 @@ CFLAGS=-std=c11 -g -fno-common
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:.c=.o)
 
-9cc: $(OBJS)
+peachcc: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(OBJS): 9cc.h
+$(OBJS): peachcc.h
 
-test: 9cc
+test: peachcc
 	./test.sh
 
 clean:
-	rm -f 9cc *.o *~ tmp*
+	rm -f peachcc *.o *~ tmp*
 .PHONY: test clean

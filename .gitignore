@@ -2,7 +2,7 @@
 *.o
 tmp*
 a.out
-9cc
+peachcc
 .idea
 .bash_history
 cmake-build-debug
