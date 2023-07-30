@@ -29,10 +29,6 @@ void error_at(char *loc, char *fmt, ...);
 
 void error_tok(Token *tok, char *fmt, ...);
 
-bool equal(Token *tok, char *op);
-
-Token *skip(Token *tok, char *s);
-
 Token *tokenize(char *p);
 
 // parser.c
@@ -47,12 +43,14 @@ typedef enum {
     ND_NE,  // !=
     ND_LT,  // <
     ND_LE,  // <=
+    ND_EXPR_STMT, // Expression statement
     ND_NUM, // Integer
 } NodeKind;
 
 typedef struct Node Node;
 struct Node {
     NodeKind kind;
+    Node *next;
     Node *lhs;
     Node *rhs;
     int val;

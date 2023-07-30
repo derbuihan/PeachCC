@@ -2,6 +2,8 @@
 
 static Node *expr(Token **rest, Token *tok);
 
+static Node *expr_stmt(Token **rest, Token *tok);
+
 static Node *equality(Token **rest, Token *tok);
 
 static Node *relational(Token **rest, Token *tok);
@@ -13,6 +15,17 @@ static Node *mul(Token **rest, Token *tok);
 static Node *unary(Token **rest, Token *tok);
 
 static Node *primary(Token **rest, Token *tok);
+
+bool equal(Token *tok, char *op) {
+    return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
+}
+
+Token *skip(Token *tok, char *s) {
+    if (!equal(tok, s)) {
+        error_tok(tok, "expect '%s'", s);
+    }
+    return tok->next;
+}
 
 static Node *new_node(NodeKind kind) {
     Node *node = calloc(1, sizeof(Node));
@@ -39,15 +52,15 @@ static Node *new_num(int val) {
     return node;
 }
 
-bool equal(Token *tok, char *op) {
-    return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
+// stmt = expr-stmt
+static Node *stmt(Token **rest, Token *tok) {
+    return expr_stmt(rest, tok);
 }
 
-Token *skip(Token *tok, char *s) {
-    if (!equal(tok, s)) {
-        error_tok(tok, "expect '%s'", s);
-    }
-    return tok->next;
+static Node *expr_stmt(Token **rest, Token *tok) {
+    Node *node = new_unary(ND_EXPR_STMT, expr(&tok, tok));
+    *rest = skip(tok, ";");
+    return node;
 }
 
 // expr = equality
@@ -201,10 +214,12 @@ static Node *primary(Token **rest, Token *tok) {
     error_at(tok->loc, "数値でも開きカッコでもないトークンです");
 }
 
+// program = stmt*
 Node *parse(Token *tok) {
-    Node *node = expr(&tok, tok);
-    if (tok->kind != TK_EOF) {
-        error_tok(tok, "予期しないトークンです");
+    Node head = {};
+    Node *cur = &head;
+    while (tok->kind != TK_EOF) {
+        cur = cur->next = stmt(&tok, tok);
     }
-    return node;
+    return head.next;
 }
