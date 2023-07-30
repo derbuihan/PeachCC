@@ -5,4 +5,5 @@ a.out
 peachcc
 .idea
 .bash_history
+core
 cmake-build-debug
