@@ -44,6 +44,16 @@ static bool startswith(char *p, char *q) {
     return memcmp(p, q, strlen(q)) == 0;
 }
 
+static bool is_indent1(char c) {
+    return ('a' <= c && c <= 'z') ||
+           ('A' <= c && c <= 'Z') ||
+           (c == '_');
+}
+
+static bool is_indent2(char c) {
+    return is_indent1(c) || ('0' <= c && c <= '9');
+}
+
 static int read_punct(char *p) {
     if (startswith(p, "==") || startswith(p, "!=") ||
         startswith(p, "<=") || startswith(p, ">=")) {
@@ -68,6 +78,15 @@ Token *tokenize(char *p) {
             char *q = p;
             cur->val = strtol(p, &p, 10);
             cur->len = p - q;
+            continue;
+        }
+
+        if (is_indent1(*p)) {
+            char *start = p;
+            do {
+                p++;
+            } while (is_indent2(*p));
+            cur = cur->next = new_token(TK_IDENT, start, p);
             continue;
         }
 

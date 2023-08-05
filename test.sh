@@ -52,4 +52,7 @@ assert 8 'a=3; z=5; a+z;'
 assert 6 'a=b=3; a+b;'
 assert 96 'a=1; b=2; c=3; d=4; e=5; f=6; g=7; h=8; i=9; j=10; j+i*h+(g+f)/(e-d)+c-b*a;'
 
+assert 3 'foo=3; foo;'
+assert 8 'foo123=3; bar=5; foo123+bar;'
+
 echo OK
