@@ -31,17 +31,6 @@ static Obj *find_var(Token *tok) {
     return NULL;
 }
 
-bool equal(Token *tok, char *op) {
-    return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
-}
-
-Token *skip(Token *tok, char *s) {
-    if (!equal(tok, s)) {
-        error_tok(tok, "expect '%s'", s);
-    }
-    return tok->next;
-}
-
 static Node *new_node(NodeKind kind) {
     Node *node = calloc(1, sizeof(Node));
     node->kind = kind;

@@ -32,6 +32,17 @@ void error_tok(Token *tok, char *fmt, ...) {
     verror_at(tok->loc, fmt, ap);
 }
 
+bool equal(Token *tok, char *op) {
+    return memcmp(tok->loc, op, tok->len) == 0 && op[tok->len] == '\0';
+}
+
+Token *skip(Token *tok, char *s) {
+    if (!equal(tok, s)) {
+        error_tok(tok, "expect '%s'", s);
+    }
+    return tok->next;
+}
+
 static Token *new_token(TokenKind kind, char *start, char *end) {
     Token *tok = calloc(1, sizeof(Token));
     tok->kind = kind;
