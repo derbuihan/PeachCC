@@ -72,7 +72,7 @@ static Obj *new_lvar(char *name) {
 
 // stmt = "return" expr ";"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
-//      | "{ compound-stmt
+//      | "{" compound-stmt
 //      | expr-stmt
 static Node *stmt(Token **rest, Token *tok) {
     if (equal(tok, "return")) {
@@ -112,7 +112,8 @@ static Node *compound_stmt(Token **rest, Token *tok) {
 
     Node *node = new_node(ND_BLOCK);
     node->body = head.next;
-    *rest = tok->next;
+
+    *rest = skip(tok, "}");
     return node;
 }
 
@@ -302,10 +303,10 @@ static Node *primary(Token **rest, Token *tok) {
 
 // program = stmt*
 Function *parse(Token *tok) {
-    tok = skip(tok, "{");
+    //tok = skip(tok, "{");
 
     Function *prog = calloc(1, sizeof(Function));
-    prog->body = compound_stmt(&tok, tok);
+    prog->body = stmt(&tok, tok); // compound_stmt(&tok, tok);
     prog->locals = locals;
     return prog;
 }
