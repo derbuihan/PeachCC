@@ -132,7 +132,7 @@ Token *tokenize(char *p) {
             continue;
         }
 
-        error_at(p, "トークナイズできません");
+        error_at(p, "invalid token");
     }
     cur = cur->next = new_token(TK_EOF, p, p);
     convert_keywords(head.next);

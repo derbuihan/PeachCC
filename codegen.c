@@ -27,6 +27,7 @@ static void gen_addr(Node *node) {
         printf("  lea %d(%%rbp), %%rax\n", node->var->offset);
         return;
     }
+    error_tok(node->tok, "not an lvalue");
 }
 
 static void gen_expr(Node *node) {
@@ -90,7 +91,7 @@ static void gen_expr(Node *node) {
             return;
     }
 
-    error("不正なノードです");
+    error_tok(node->tok, "invalid expression");
 }
 
 static void gen_stmt(Node *node) {
@@ -143,7 +144,7 @@ static void gen_stmt(Node *node) {
             return;
         }
     }
-    error("invalid statement");
+    error_tok(node->tok, "invalid statement");
 }
 
 static void assign_lvar_offsets(Function *prog) {
