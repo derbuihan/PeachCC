@@ -73,4 +73,8 @@ assert 5 '{if (0) { if (1) {return 3;} else {return 4;}} else {return 5;} return
 assert 4 '{if (1) { if (0) {return 3;} else {return 4;}} else {return 5;} return 6; }'
 assert 3 '{if (1) { if (1) {return 3;} else {return 4;}} else {return 5;} return 6; }'
 
+assert 55 '{i=0; j=0; for (i=0; i<=10; i=i+1) j=i+j; return j;}'
+assert 55 '{i=0; j=0; for (i=0; i<=10; i=i+1) {j=i+j;} return j;}'
+assert 3 '{for (;;) {return 3;} return 5;}'
+
 echo OK
