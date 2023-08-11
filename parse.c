@@ -26,15 +26,6 @@ static Node *unary(Token **rest, Token *tok);
 
 static Node *primary(Token **rest, Token *tok);
 
-static Obj *find_var(Token *tok) {
-    for (Obj *var = locals; var; var = var->next) {
-        if (strlen(var->name) == tok->len && !strncmp(tok->loc, var->name, tok->len)) {
-            return var;
-        }
-    }
-    return NULL;
-}
-
 static Node *new_node(NodeKind kind, Token *tok) {
     Node *node = calloc(1, sizeof(Node));
     node->kind = kind;
@@ -65,6 +56,15 @@ static Node *new_var_node(Obj *var, Token *tok) {
     Node *node = new_node(ND_VAR, tok);
     node->var = var;
     return node;
+}
+
+static Obj *find_var(Token *tok) {
+    for (Obj *var = locals; var; var = var->next) {
+        if (strlen(var->name) == tok->len && !strncmp(tok->loc, var->name, tok->len)) {
+            return var;
+        }
+    }
+    return NULL;
 }
 
 static Obj *new_lvar(char *name, Type *ty) {
