@@ -3,6 +3,9 @@
 cat << EOF | gcc -xc -c -o tmp2.o -
 int ret11() {return 11;}
 int ret22() {return 22;}
+int add(int x, int y) {return x+y;}
+int sub(int x, int y) {return x-y;}
+int add6(int a1, int a2, int a3, int a4, int a5, int a6) {return a1+a2+a3+a4+a5+a6;}
 EOF
 
 assert() {
@@ -99,5 +102,10 @@ assert 2 '{int x=11; return (&x+1)-(&x-1);}'
 
 assert 11 '{return ret11();}'
 assert 33 '{int a = ret11(); int b = ret22(); return a + b;}'
+
+assert 33 '{return add(11, 22);}'
+assert 11 '{return sub(22, 11);}'
+assert 21 '{return add6(1, 2, 3, 4, 5, 6);}'
+assert 10 '{return sub(add6(1, 2, 3, 4, 5, 6), 11);}'
 
 echo OK
