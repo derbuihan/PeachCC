@@ -110,5 +110,15 @@ assert 10 'int main() {return sub(add6(1, 2, 3, 4, 5, 6), 11);}'
 assert 32 'int main() {return ret32();} int ret32() {return 32;}'
 assert 32 'int ret16() {return 16;} int main() {return 32;}'
 assert 16 'int ret16() {return 16;} int main() {return ret16();}'
+assert 11 'int iden(int x) {return x;} int main() {return iden(11);} '
+assert 33 'int add2(int x, int y) {return x + y;} int main() {return add2(11, 22);}'
+
+assert 66 'int add3(int x, int y, int z) {return x + y + z;} int main() {return add3(11, 22, 33);}'
+assert 44 'int add2(int x, int y) { return x + y + ret11(); } int main() { return add2(11, 22); }'
+assert 38 'int ret5() { return 5; } int add2(int x, int y) { return x + y + ret5(); } int main() { return add2(11, 22); }'
+assert 1 'int main() {return fib(1);} int fib(int x) { if (x<=1) {return 1;} return fib(x-1) + fib(x-2); }'
+assert 2 'int main() {return fib(2);} int fib(int x) { if (x<=1) {return 1;} return fib(x-1) + fib(x-2); }'
+assert 55 'int main() {return fib(9);} int fib(int x) { if (x<=1) {return 1;} return fib(x-1) + fib(x-2); }'
+
 
 echo OK
