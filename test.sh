@@ -1,11 +1,16 @@
 #!/bin/bash
 
+cat << EOF | gcc -xc -c -o tmp2.o -
+int ret11() {return 11;}
+int ret22() {return 22;}
+EOF
+
 assert() {
   expected="$1"
   input="$2"
 
   ./peachcc "$input" > tmp.s || exit
-  gcc -static -o tmp tmp.s
+  gcc -static -o tmp tmp.s tmp2.o
   ./tmp
   actual="$?"
 
@@ -17,33 +22,33 @@ assert() {
   fi
 }
 
-#assert 0 '{return 0;}'
-#assert 21 '{return 5+20-4;}'
-#assert 41 '{return  12 + 34 - 5 ;}'
-#assert 10 '{return 2+2*4;}'
-#assert 4 '{return (3+5)/2;}'
-#assert 10 '{return -10+20;}'
-#assert 10 '{return --10;}'
-#assert 10 '{return --+10;}'
-#
-#assert 0 '{return 0==1;}'
-#assert 1 '{return 42==42;}'
-#assert 1 '{return 0!=1;}'
-#assert 0 '{return 42!=42;}'
-#
-#assert 1 '{return 0<1;}'
-#assert 0 '{return 1<1;}'
-#assert 0 '{return 2<1;}'
-#assert 1 '{return 0<=1;}'
-#assert 1 '{return 1<=1;}'
-#assert 0 '{return 2<=1;}'
-#
-#assert 1 '{return 1>0;}'
-#assert 0 '{return 1>1;}'
-#assert 0 '{return 1>2;}'
-#assert 1 '{return 1>=0;}'
-#assert 1 '{return 1>=1;}'
-#assert 0 '{return 1>=2;}'
+assert 0 '{return 0;}'
+assert 21 '{return 5+20-4;}'
+assert 41 '{return  12 + 34 - 5 ;}'
+assert 10 '{return 2+2*4;}'
+assert 4 '{return (3+5)/2;}'
+assert 10 '{return -10+20;}'
+assert 10 '{return --10;}'
+assert 10 '{return --+10;}'
+
+assert 0 '{return 0==1;}'
+assert 1 '{return 42==42;}'
+assert 1 '{return 0!=1;}'
+assert 0 '{return 42!=42;}'
+
+assert 1 '{return 0<1;}'
+assert 0 '{return 1<1;}'
+assert 0 '{return 2<1;}'
+assert 1 '{return 0<=1;}'
+assert 1 '{return 1<=1;}'
+assert 0 '{return 2<=1;}'
+
+assert 1 '{return 1>0;}'
+assert 0 '{return 1>1;}'
+assert 0 '{return 1>2;}'
+assert 1 '{return 1>=0;}'
+assert 1 '{return 1>=1;}'
+assert 0 '{return 1>=2;}'
 
 assert 3 '{int a; a=3; return a;}'
 assert 3 '{int a=3; return a;}'
@@ -90,5 +95,9 @@ assert 5 '{int x=3; int *y=&x; *y=5; return x; }'
 assert 7 '{int x=3; int y=5; *(&x+1)=7; return y; }'
 assert 7 '{int x=3; int y=5; *(&y-2+1)=7; return x; }'
 assert 5 '{int x=3; int y=5; return (&x+2)-&x+3; }'
+assert 2 '{int x=11; return (&x+1)-(&x-1);}'
+
+assert 11 '{return ret11();}'
+assert 33 '{int a = ret11(); int b = ret22(); return a + b;}'
 
 echo OK

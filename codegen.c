@@ -1,6 +1,5 @@
 #include "peachcc.h"
 
-
 static int depth;
 
 static void gen_expr(Node *node);
@@ -62,6 +61,10 @@ static void gen_expr(Node *node) {
             gen_expr(node->rhs);
             pop("%rdi");
             printf("  mov %%rax, (%%rdi)\n");
+            return;
+        case ND_FUNCALL:
+            printf("  mov $0, %%rax\n");
+            printf("  call %s\n", node->funcname);
             return;
     }
 

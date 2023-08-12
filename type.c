@@ -13,7 +13,6 @@ Type *pointer_to(Type *base) {
     return ty;
 }
 
-
 void add_type(Node *node) {
     if (!node || node->ty) {
         return;
@@ -45,6 +44,7 @@ void add_type(Node *node) {
         case ND_LT:
         case ND_LE:
         case ND_NUM:
+        case ND_FUNCALL:
             node->ty = ty_int;
             return;
         case ND_VAR:

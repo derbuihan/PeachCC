@@ -100,7 +100,7 @@ static Type *declarator(Token **rest, Token *tok, Type *ty) {
     }
 
     ty->name = tok;
-    *rest = tok->next;
+    *rest = tok->next; // skip ident
     return ty;
 }
 
@@ -132,7 +132,7 @@ static Node *declaration(Token **rest, Token *tok) {
 
     Node *node = new_node(ND_BLOCK, tok);
     node->body = head.next;
-    *rest = tok->next;
+    *rest = tok->next; // skip ';'
     return node;
 }
 
@@ -333,14 +333,17 @@ static Node *new_add(Node *lhs, Node *rhs, Token *tok) {
     add_type(lhs);
     add_type(rhs);
 
+    // num + num
     if (is_integer(lhs->ty) && is_integer(rhs->ty)) {
         return new_binary(ND_ADD, lhs, rhs, tok);
     }
 
+    // ptr + ptr
     if (lhs->ty->base && rhs->ty->base) {
         error_tok(tok, "invalid operands");
     }
 
+    // num + ptr -> ptr + num
     if (!lhs->ty->base && rhs->ty->base) {
         Node *tmp = lhs;
         lhs = rhs;
@@ -355,10 +358,12 @@ static Node *new_sub(Node *lhs, Node *rhs, Token *tok) {
     add_type(lhs);
     add_type(rhs);
 
+    // num - num
     if (is_integer(lhs->ty) && is_integer(rhs->ty)) {
         return new_binary(ND_SUB, lhs, rhs, tok);
     }
 
+    // ptr - num
     if (lhs->ty->base && is_integer(rhs->ty)) {
         rhs = new_binary(ND_MUL, rhs, new_num(8, tok), tok);
         add_type(rhs);
@@ -367,6 +372,7 @@ static Node *new_sub(Node *lhs, Node *rhs, Token *tok) {
         return node;
     }
 
+    // ptr - ptr = num
     if (lhs->ty->base && rhs->ty->base) {
         Node *node = new_binary(ND_SUB, lhs, rhs, tok);
         node->ty = ty_int;
@@ -450,7 +456,8 @@ static Node *unary(Token **rest, Token *tok) {
     return primary(rest, tok);
 }
 
-// primary = "(" expr ")" | ident | num
+// primary = "(" expr ")" | ident args? | num
+// args = "(" ")"
 static Node *primary(Token **rest, Token *tok) {
     if (equal(tok, "(")) {
         Node *node = expr(&tok, tok->next);
@@ -459,6 +466,14 @@ static Node *primary(Token **rest, Token *tok) {
     }
 
     if (tok->kind == TK_IDENT) {
+        // Function call
+        if (equal(tok->next, "(")) {
+            Node *node = new_node(ND_FUNCALL, tok);
+            node->funcname = strndup(tok->loc, tok->len);
+            *rest = skip(tok->next->next, ")");
+            return node;
+        }
+
         Obj *var = find_var(tok);
         if (!var) {
             error_tok(tok, "undefined variable");
