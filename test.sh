@@ -134,4 +134,17 @@ assert 11 'int main() { int x[2][3]; int *y = x; *(y+3) = 11; return **(x+1); }'
 assert 11 'int main() { int x[2][3]; int *y = x; *(y+4) = 11; return *(*(x+1)+1); }'
 assert 11 'int main() { int x[2][3]; int *y = x; *(y+5) = 11; return *(*(x+1)+2); }'
 
+assert 3 'int main() { int x[3]; *x = 3; x[1] = 4; x[2] = 5; return *x; }'
+assert 4 'int main() { int x[3]; *x = 3; x[1] = 4; x[2] = 5; return *(x+1); }'
+assert 5 'int main() { int x[3]; *x = 3; x[1] = 4; x[2] = 5; return *(x+2); }'
+assert 5 'int main() { int x[3]; *x = 3; x[1] = 4; 2[x] = 5; return *(x+2); }'
+
+assert 3 'int main() { int x[2][3]; int *y=x; y[0]=3; return x[0][0]; }'
+assert 4 'int main() { int x[2][3]; int *y=x; y[1]=4; return x[0][1]; }'
+assert 5 'int main() { int x[2][3]; int *y=x; y[2]=5; return x[0][2]; }'
+assert 6 'int main() { int x[2][3]; int *y=x; y[3]=6; return x[1][0]; }'
+assert 7 'int main() { int x[2][3]; int *y=x; y[4]=7; return x[1][1]; }'
+assert 8 'int main() { int x[2][3]; int *y=x; y[5]=8; return x[1][2]; }'
+
+
 echo OK

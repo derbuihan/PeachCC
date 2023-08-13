@@ -26,6 +26,8 @@ static Node *add(Token **rest, Token *tok);
 
 static Node *mul(Token **rest, Token *tok);
 
+static Node *postfix(Token **rest, Token *tok);
+
 static Node *unary(Token **rest, Token *tok);
 
 static Node *primary(Token **rest, Token *tok);
@@ -135,7 +137,7 @@ static Type *type_suffix(Token **rest, Token *tok, Type *ty) {
         ty = type_suffix(rest, tok, ty);
         return array_of(ty, sz);
     }
-    
+
     *rest = tok;
     return ty;
 }
@@ -488,6 +490,7 @@ static Node *mul(Token **rest, Token *tok) {
 }
 
 // unary = ("+" | "-" | "*" | "&")? primary
+//       | postfix
 static Node *unary(Token **rest, Token *tok) {
     if (equal(tok, "+")) {
         return unary(rest, tok->next);
@@ -505,7 +508,22 @@ static Node *unary(Token **rest, Token *tok) {
         return new_unary(ND_DEREF, unary(rest, tok->next), tok);
     }
 
-    return primary(rest, tok);
+    return postfix(rest, tok);
+}
+
+// postfix = primary ("[" expr "]")*
+static Node *postfix(Token **rest, Token *tok) {
+    Node *node = primary(&tok, tok);
+
+    while (equal(tok, "[")) {
+        Token *start = tok;
+        Node *idx = expr(&tok, tok->next);
+        tok = skip(tok, "]");
+        node = new_unary(ND_DEREF, new_add(node, idx, start), start);
+    }
+
+    *rest = tok;
+    return node;
 }
 
 // funcall = ident "(" (assign ("," assign)*)? ")"
