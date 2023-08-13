@@ -120,9 +120,18 @@ assert 1 'int main() {return fib(1);} int fib(int x) { if (x<=1) {return 1;} ret
 assert 2 'int main() {return fib(2);} int fib(int x) { if (x<=1) {return 1;} return fib(x-1) + fib(x-2); }'
 assert 55 'int main() {return fib(9);} int fib(int x) { if (x<=1) {return 1;} return fib(x-1) + fib(x-2); }'
 
+assert 3 'int main() { int x[2]; int *y = x; *y = 3; return *x;}'
+assert 3 'int main() { int x[2]; int *y = x+1; *y = 3; return *(x+1);}'
 assert 3 'int main() { int x[2]; int *y = &x; *y = 3; return *x;}'
 assert 3 'int main() { int x[3]; *x = 3; *(x+1) = 4; *(x+2) = 5; return *x; }'
 assert 4 'int main() { int x[3]; *x = 3; *(x+1) = 4; *(x+2) = 5; return *(x+1); }'
 assert 5 'int main() { int x[3]; *x = 3; *(x+1) = 4; *(x+2) = 5; return *(x+2); }'
+
+assert 11 'int main() { int x[2][3]; int *y = x; *y = 11; return **x; }'
+assert 11 'int main() { int x[2][3]; int *y = x; *(y+1) = 11; return *(*x+1); }'
+assert 11 'int main() { int x[2][3]; int *y = x; *(y+2) = 11; return *(*x+2); }'
+assert 11 'int main() { int x[2][3]; int *y = x; *(y+3) = 11; return **(x+1); }'
+assert 11 'int main() { int x[2][3]; int *y = x; *(y+4) = 11; return *(*(x+1)+1); }'
+assert 11 'int main() { int x[2][3]; int *y = x; *(y+5) = 11; return *(*(x+1)+2); }'
 
 echo OK
