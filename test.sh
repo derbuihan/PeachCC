@@ -146,5 +146,13 @@ assert 6 'int main() { int x[2][3]; int *y=x; y[3]=6; return x[1][0]; }'
 assert 7 'int main() { int x[2][3]; int *y=x; y[4]=7; return x[1][1]; }'
 assert 8 'int main() { int x[2][3]; int *y=x; y[5]=8; return x[1][2]; }'
 
+assert 8 'int main() { int x; return sizeof(x); }'
+assert 8 'int main() { int x; return sizeof x; }'
+assert 8 'int main() { int *x; return sizeof(x); }'
+assert 32 'int main() { int x[4]; return sizeof(x); }'
+assert 96 'int main() { int x[3][4]; return sizeof(x); }'
+assert 32 'int main() { int x[3][4]; return sizeof(*x); }'
+assert 8 'int main() { int x[3][4]; return sizeof(**x); }'
+assert 9 'int main() { int x[3][4]; return sizeof(**x) + 1; }'
 
 echo OK
