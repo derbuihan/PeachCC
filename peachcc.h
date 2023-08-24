@@ -121,6 +121,7 @@ Obj *parse(Token *tok);
 // type.c
 
 typedef enum {
+    TY_CHAR,
     TY_INT,
     TY_PTR,
     TY_FUNC,
@@ -146,6 +147,8 @@ struct Type {
     Type *params;
     Type *next;
 };
+
+extern Type *ty_char;
 
 extern Type *ty_int;
 
