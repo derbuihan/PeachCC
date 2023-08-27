@@ -10,6 +10,7 @@ $(OBJS): peachcc.h
 
 test: peachcc
 	./test.sh
+	./test-driver.sh
 
 clean:
 	rm -f peachcc *.o *~ tmp*

@@ -12,7 +12,7 @@ assert() {
   expected="$1"
   input="$2"
 
-  echo "$input" | ./peachcc - > tmp.s || exit
+  echo "$input" | ./peachcc -o tmp.s - || exit
   gcc -static -o tmp tmp.s tmp2.o
   ./tmp
   actual="$?"
