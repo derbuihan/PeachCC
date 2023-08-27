@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -51,7 +52,7 @@ Token *skip(Token *tok, char *op);
 
 bool consume(Token **rest, Token *tok, char *str);
 
-Token *tokenize(char *p);
+Token *tokenize_file(char *filename);
 
 // parser.c
 

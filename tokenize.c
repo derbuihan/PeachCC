@@ -1,5 +1,8 @@
 #include "peachcc.h"
 
+
+static char *current_filename;
+
 static char *current_input;
 
 void error(char *fmt, ...) {
@@ -11,8 +14,25 @@ void error(char *fmt, ...) {
 }
 
 void verror_at(char *loc, char *fmt, va_list ap) {
-    int pos = loc - current_input;
-    fprintf(stderr, "%s\n", current_input);
+    char *line = loc;
+    while (current_input < line && line[-1] != '\n') {
+        line--;
+    }
+
+    char *end = loc;
+    while (*end != '\n') {
+        end++;
+    }
+
+    int line_no = 1;
+    for (char *p = current_input; p < line; p++) {
+        if (*p == '\n') {
+            line_no++;
+        }
+    }
+
+    int pos = loc - line + 1;
+
     fprintf(stderr, "%*s", pos, "");
     fprintf(stderr, "^ ");
     vfprintf(stderr, fmt, ap);
@@ -203,7 +223,8 @@ static void convert_keywords(Token *tok) {
     }
 }
 
-Token *tokenize(char *p) {
+static Token *tokenize(char *filename, char *p) {
+    current_filename = filename;
     current_input = p;
     Token head = {};
     Token *cur = &head;
@@ -256,3 +277,46 @@ Token *tokenize(char *p) {
     convert_keywords(head.next);
     return head.next;
 }
+
+static char *read_file(char *path) {
+    FILE *fp;
+
+    if (strcmp(path, "-") == 0) {
+        fp = stdin;
+    } else {
+        fp = fopen(path, "r");
+        if (!fp) {
+            error("cannot open %s: %s", path, strerror(errno));
+        }
+    }
+
+    char *buf;
+    size_t buflen;
+    FILE *out = open_memstream(&buf, &buflen);
+
+    for (;;) {
+        char buf2[4096];
+        int n = fread(buf2, 1, sizeof(buf2), fp);
+        if (n == 0) {
+            break;
+        }
+        fwrite(buf2, 1, n, out);
+    }
+
+    if (fp != stdin) {
+        fclose(fp);
+    }
+
+    fflush(out);
+    if (buflen == 0 || buf[buflen - 1] != '\n') {
+        fputc('\n', out);
+    }
+    fputc('\0', out);
+    fclose(out);
+    return buf;
+}
+
+Token *tokenize_file(char *path) {
+    return tokenize(path, read_file(path));
+}
+
