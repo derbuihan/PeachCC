@@ -12,6 +12,3 @@ char *format(char *fmt, ...) {
     fclose(out);
     return buf;
 }
-
-
-

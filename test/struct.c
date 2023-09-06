@@ -165,15 +165,23 @@ int main() {
         } x;
         sizeof(x);
     }));
-    ASSERT(9, ({
+    ASSERT(0, ({
+        struct {
+        } x;
+        sizeof(x);
+    }));
+
+    ASSERT(16, ({
         struct {
             char a;
             int b;
         } x;
         sizeof(x);
     }));
-    ASSERT(0, ({
+    ASSERT(16, ({
         struct {
+            int a;
+            char b;
         } x;
         sizeof(x);
     }));
