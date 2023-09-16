@@ -69,7 +69,7 @@ static void gen_addr(Node *node) {
 }
 
 static void load(Type *ty) {
-    if (ty->kind == TY_ARRAY) {
+    if (ty->kind == TY_ARRAY || ty->kind == TY_STRUCT || ty->kind == TY_UNION) {
         return;
     }
 
@@ -82,6 +82,14 @@ static void load(Type *ty) {
 
 static void store(Type *ty) {
     pop("%rdi");
+
+    if (ty->kind == TY_STRUCT || ty->kind == TY_UNION) {
+        for (int i = 0; i < ty->size; i++) {
+            println("  mov %d(%%rax), %%r8b", i);
+            println("  mov %%r8b, %d(%%rdi)", i);
+        }
+        return;
+    }
 
     if (ty->size == 1) {
         println("  mov %%al, (%%rdi)");
