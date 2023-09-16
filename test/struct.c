@@ -341,6 +341,13 @@ int main() {
         } x;
         sizeof(x);
     }));
+    ASSERT(4, ({
+        struct {
+            short a;
+            short b;
+        } x;
+        sizeof(x);
+    }));
 
     printf("OK\n");
     return 0;
