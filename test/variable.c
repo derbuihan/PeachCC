@@ -188,6 +188,11 @@ int main() {
         b - a;
     }));
 
+    ASSERT(8, ({
+        long x;
+        sizeof(x);
+    }));
+
     printf("OK\n");
     return 0;
 }

@@ -334,6 +334,14 @@ int main() {
         sizeof(y);
     }));
 
+    ASSERT(16, ({
+        struct {
+            long a;
+            long b;
+        } x;
+        sizeof(x);
+    }));
+
     printf("OK\n");
     return 0;
 }
