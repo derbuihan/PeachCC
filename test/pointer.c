@@ -26,6 +26,11 @@ int main() {
         int y = 5;
         *(&x - (-1));
     }));
+    ASSERT(3, ({
+        int x = 3;
+        int y = 5;
+        *(&y + (-1));
+    }));
     ASSERT(5, ({
         int x = 3;
         int *y = &x;
