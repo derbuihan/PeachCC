@@ -3,7 +3,7 @@
 
 int main() {
     ASSERT(131585, (int) 8590066177);
-    //ASSERT(513, (short) 8590066177);
+    ASSERT(513, (short) 8590066177);
     ASSERT(1, (char) 8590066177);
     ASSERT(1, (long) 1);
     ASSERT(0, (long) &*(int *) 0);

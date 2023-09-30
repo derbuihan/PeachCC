@@ -78,9 +78,9 @@ static void load(Type *ty) {
     }
 
     if (ty->size == 1) {
-        println("  movsbq (%%rax), %%rax");
+        println("  movsbl (%%rax), %%eax");
     } else if (ty->size == 2) {
-        println("  movswq (%%rax), %%rax");
+        println("  movswl (%%rax), %%eax");
     } else if (ty->size == 4) {
         println("  movslq (%%rax), %%rax");
     } else {
@@ -128,11 +128,11 @@ static int getTypeId(Type *ty) {
 
 static char i32i8[] = "movsbl %al, %eax";
 static char i32i16[] = "movswl %ax, %eax";
-static char i32i64[] = "movsbq %eax, %rax";
+static char i32i64[] = "movslq %eax, %rax";
 
 static char *cast_table[][10] = {
-        {NULL, NULL, NULL, i32i64}, // i8
-        {i32i8, NULL, NULL, i32i64}, // i16
+        {NULL,  NULL,   NULL, i32i64}, // i8
+        {i32i8, NULL,   NULL, i32i64}, // i16
         {i32i8, i32i16, NULL, i32i64}, // i32
         {i32i8, i32i16, NULL, NULL}, // i64
 };
