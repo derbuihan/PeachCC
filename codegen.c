@@ -110,6 +110,15 @@ static void store(Type *ty) {
     }
 }
 
+static void cmp_zero(Type *ty) {
+    if (is_integer(ty) && ty->size <= 4) {
+        println("  cmp $0, %%eax");
+    } else {
+        println("  cmp $0, %%rax");
+    }
+}
+
+
 enum {
     I8, I16, I32, I64
 };
@@ -141,6 +150,13 @@ static void cast(Type *from, Type *to) {
     if (to->kind == TY_VOID) {
         return;
     }
+    if (to->kind == TY_BOOL) {
+        cmp_zero(from);
+        println("  setne %%al");
+        println("  movzx %%al, %%eax");
+        return;
+    }
+
     int t1 = getTypeId(from);
     int t2 = getTypeId(to);
     if (cast_table[t1][t2]) {
