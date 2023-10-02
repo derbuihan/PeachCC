@@ -109,6 +109,7 @@ static int read_punct(char *p) {
     static char *kw[] = {
             "==", "!=", "<=", ">=", "->",
             "+=", "-=", "*=", "/=", "++", "--",
+            "%="
     };
     for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++) {
         if (startswith(p, kw[i])) {
