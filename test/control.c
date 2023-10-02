@@ -75,6 +75,18 @@ int main() {
         j;
     }));
 
+    ASSERT(55, ({
+        int j = 0;
+        for (int i = 0; i <= 10; i = i + 1) j = i + j;
+        j;
+    }));
+    ASSERT(3, ({
+        int i = 3;
+        int j = 0;
+        for (int i = 0; i < 10; i = i + 1) j = i + j;
+        i;
+    }));
+
     printf("OK\n");
     return 0;
 }
