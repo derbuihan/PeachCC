@@ -44,6 +44,9 @@ int main() {
         sizeof(i++);
     }));
 
+    ASSERT(8, sizeof(int (*)[10]));
+    ASSERT(8, sizeof(int (*)[][10]));
+
     printf("OK\n");
     return 0;
 }
