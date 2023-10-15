@@ -46,6 +46,8 @@ static Node *labels;
 static char *brk_label;
 static char *cont_label;
 
+static Node *current_switch;
+
 static bool is_typename(Token *tok);
 
 static Type *declspec(Token **rest, Token *tok, VarAttr *attr);
@@ -584,6 +586,9 @@ static bool is_typename(Token *tok) {
 
 // stmt = "return" expr ";"
 //      | "if" "(" expr ")" stmt ("else" stmt)?
+//      | "switch" "(" expr ")" stmt
+//      | "case" num ":" stmt
+//      | "default" ":" stmt
 //      | "for" "(" expr-stmt expr? ";" expr? ")" stmt
 //      | "while" "(" expr ")" stmt
 //      | "goto" ident ";"
@@ -615,6 +620,54 @@ static Node *stmt(Token **rest, Token *tok) {
         *rest = tok;
         return node;
     }
+
+    if (equal(tok, "switch")) {
+        Node *node = new_node(ND_SWITCH, tok);
+        tok = skip(tok->next, "(");
+        node->cond = expr(&tok, tok);
+        tok = skip(tok, ")");
+
+        Node *sw = current_switch;
+        current_switch = node;
+
+        char *brk = brk_label;
+        brk_label = node->brk_label = new_unique_name();
+
+        node->then = stmt(rest, tok);
+
+        current_switch = sw;
+        brk_label = brk;
+        return node;
+    }
+
+    if (equal(tok, "case")) {
+        if (!current_switch) {
+            error_tok(tok, "stray case");
+        }
+        int val = get_number(tok->next);
+
+        Node *node = new_node(ND_CASE, tok);
+        tok = skip(tok->next->next, ":");
+        node->label = new_unique_name();
+        node->lhs = stmt(rest, tok);
+        node->val = val;
+        node->case_next = current_switch->case_next;
+        current_switch->case_next = node;
+        return node;
+    }
+
+    if (equal(tok, "default")) {
+        if (!current_switch) {
+            error_tok(tok, "stray default");
+        }
+        Node *node = new_node(ND_CASE, tok);
+        tok = skip(tok->next, ":");
+        node->label = new_unique_name();
+        node->lhs = stmt(rest, tok);
+        current_switch->default_case = node;
+        return node;
+    }
+
 
     if (equal(tok, "for")) {
         Node *node = new_node(ND_FOR, tok);

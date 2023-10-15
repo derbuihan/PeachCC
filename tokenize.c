@@ -126,6 +126,7 @@ static bool is_keyword(Token *tok) {
             "struct", "union", "short", "long",
             "void", "typedef", "_Bool", "enum",
             "static", "goto", "break", "continue",
+            "switch", "case", "default",
     };
     for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++) {
         if (equal(tok, kw[i])) {
