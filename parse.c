@@ -84,6 +84,8 @@ static Node *equality(Token **rest, Token *tok);
 
 static Node *relational(Token **rest, Token *tok);
 
+static Node *shift(Token **rest, Token *tok);
+
 static Node *add(Token **rest, Token *tok);
 
 static Node *new_add(Node *lhs, Node *rhs, Token *tok);
@@ -849,7 +851,7 @@ static Node *to_assign(Node *binary) {
 }
 
 // assign = logor (assign-op assign)?
-// assign-op = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^="
+// assign-op = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>="
 static Node *assign(Token **rest, Token *tok) {
     Node *node = logor(&tok, tok);
 
@@ -887,6 +889,14 @@ static Node *assign(Token **rest, Token *tok) {
 
     if (equal(tok, "^=")) {
         return to_assign(new_binary(ND_BITXOR, node, assign(rest, tok->next), tok));
+    }
+
+    if (equal(tok, "<<=")) {
+        return to_assign(new_binary(ND_SHL, node, assign(rest, tok->next), tok));
+    }
+
+    if (equal(tok, ">>=")) {
+        return to_assign(new_binary(ND_SHR, node, assign(rest, tok->next), tok));
     }
 
     *rest = tok;
@@ -977,9 +987,9 @@ static Node *equality(Token **rest, Token *tok) {
     }
 }
 
-// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+// relational = shift ("<" shift | "<=" shift | ">" shift | ">=" shift)*
 static Node *relational(Token **rest, Token *tok) {
-    Node *node = add(&tok, tok);
+    Node *node = shift(&tok, tok);
 
     for (;;) {
         Token *start = tok;
@@ -988,7 +998,7 @@ static Node *relational(Token **rest, Token *tok) {
             node = new_binary(
                     ND_LT,
                     node,
-                    add(&tok, tok->next),
+                    shift(&tok, tok->next),
                     start);
             continue;
         }
@@ -997,7 +1007,7 @@ static Node *relational(Token **rest, Token *tok) {
             node = new_binary(
                     ND_LE,
                     node,
-                    add(&tok, tok->next),
+                    shift(&tok, tok->next),
                     start);
             continue;
         }
@@ -1005,7 +1015,7 @@ static Node *relational(Token **rest, Token *tok) {
         if (equal(tok, ">")) {
             node = new_binary(
                     ND_LT,
-                    add(&tok, tok->next),
+                    shift(&tok, tok->next),
                     node,
                     start);
             continue;
@@ -1014,12 +1024,30 @@ static Node *relational(Token **rest, Token *tok) {
         if (equal(tok, ">=")) {
             node = new_binary(
                     ND_LE,
-                    add(&tok, tok->next),
+                    shift(&tok, tok->next),
                     node,
                     start);
             continue;
         }
 
+        *rest = tok;
+        return node;
+    }
+}
+
+// shift = add ("<<" add | ">>" add)*
+static Node *shift(Token **rest, Token *tok) {
+    Node *node = add(&tok, tok);
+    for (;;) {
+        Token *start = tok;
+        if (equal(tok, "<<")) {
+            node = new_binary(ND_SHL, node, add(&tok, tok->next), start);
+            continue;
+        }
+        if (equal(tok, ">>")) {
+            node = new_binary(ND_SHR, node, add(&tok, tok->next), start);
+            continue;
+        }
         *rest = tok;
         return node;
     }
