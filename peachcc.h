@@ -242,6 +242,8 @@ Type *array_of(Type *base, int size);
 
 Type *enum_type(void);
 
+Type *struct_type(void);
+
 void add_type(Node *node);
 
 // codegen.c
