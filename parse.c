@@ -599,7 +599,7 @@ static void initializer2(Token **rest, Token *tok, Initializer *init) {
     if (init->ty->kind == TY_ARRAY) {
         tok = skip(tok, "{");
 
-        for (int i = 0; i < init->ty->array_len; i++) {
+        for (int i = 0; i < init->ty->array_len && !equal(tok, "}"); i++) {
             if (i > 0)
                 tok = skip(tok, ",");
             initializer2(&tok, tok, init->children[i]);
@@ -638,15 +638,21 @@ static Node *create_lvar_init(Initializer *init, Type *ty, InitDesg *desg, Token
         return node;
     }
 
+    if (!init->expr) {
+        return new_node(ND_NULL_EXPR, tok);
+    }
+
     Node *lhs = init_desg_expr(desg, tok);
-    Node *rhs = init->expr;
-    return new_binary(ND_ASSIGN, lhs, rhs, tok);
+    return new_binary(ND_ASSIGN, lhs, init->expr, tok);
 }
 
 static Node *lvar_initializer(Token **rest, Token *tok, Obj *var) {
     Initializer *init = initializer(rest, tok, var->ty);
     InitDesg desg = {NULL, 0, var};
-    return create_lvar_init(init, var->ty, &desg, tok);
+    Node *lhs = new_node(ND_MEMZERO, tok);
+    lhs->var = var;
+    Node *rhs = create_lvar_init(init, var->ty, &desg, tok);
+    return new_binary(ND_COMMA, lhs, rhs, tok);
 }
 
 static bool is_typename(Token *tok) {
