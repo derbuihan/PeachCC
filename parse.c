@@ -76,6 +76,10 @@ static Type *declarator(Token **rest, Token *tok, Type *ty);
 
 static Node *declaration(Token **rest, Token *tok, Type *basety);
 
+static void initializer2(Token **rest, Token *tok, Initializer *init);
+
+static Initializer *initializer(Token **rest, Token *tok, Type *ty);
+
 static Node *lvar_initializer(Token **rest, Token *tok, Obj *var);
 
 static Node *compound_stmt(Token **rest, Token *tok);
@@ -605,20 +609,37 @@ static Token *skip_excess_elemnt(Token *tok) {
     return skip(tok, ",");
 }
 
-static void initializer2(Token **rest, Token *tok, Initializer *init) {
-    if (init->ty->kind == TY_ARRAY) {
-        tok = skip(tok, "{");
+static void string_initializer(Token **rest, Token *tok, Initializer *init) {
+    int len = MIN(init->ty->array_len, tok->ty->array_len);
+    for (int i = 0; i < len; i++) {
+        init->children[i]->expr = new_num(tok->str[i], tok);
+    }
+    *rest = tok->next;
+}
 
-        for (int i = 0; !consume(rest, tok, "}"); i++) {
-            if (i > 0)
-                tok = skip(tok, ",");
+static void array_initializer(Token **rest, Token *tok, Initializer *init) {
+    tok = skip(tok, "{");
 
-            if (i < init->ty->array_len) {
-                initializer2(&tok, tok, init->children[i]);
-            } else {
-                tok = skip_excess_elemnt(tok);
-            }
+    for (int i = 0; !consume(rest, tok, "}"); i++) {
+        if (i > 0)
+            tok = skip(tok, ",");
+
+        if (i < init->ty->array_len) {
+            initializer2(&tok, tok, init->children[i]);
+        } else {
+            tok = skip_excess_elemnt(tok);
         }
+    }
+}
+
+static void initializer2(Token **rest, Token *tok, Initializer *init) {
+    if (init->ty->kind == TY_ARRAY && tok->kind == TK_STR) {
+        string_initializer(rest, tok, init);
+        return;
+    }
+
+    if (init->ty->kind == TY_ARRAY) {
+        array_initializer(rest, tok, init);
         return;
     }
 
